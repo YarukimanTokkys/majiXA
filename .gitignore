@@ -1,0 +1,22 @@
+# Unity generates
+/[Tt]emp
+/[Ll]ibrary
+/[Oo]bj
+/Logs
+/*.sln
+/*.csproj
+/*.unityproj
+/*.booproj
+
+!/majixa.csproj
+
+# Visual Studio / MonoDevelop generates
+*.userprefs
+
+# Others
+.vs/
+.vscode/
+Thumbs.db
+Thumbs.db.meta
+.DS_Store
+server.log
