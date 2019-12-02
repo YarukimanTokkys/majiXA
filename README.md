@@ -1,3 +1,5 @@
+<center><img src="logo.png" width="100"></center>
+
 # MajiXA
 
 リアルタイム通信パッケージ for Unity
