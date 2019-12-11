@@ -59,7 +59,14 @@ namespace MajiXA
                     processingActionDict.Add((byte)cmd, (IProcessing)System.Activator.CreateInstance(t));
                 }
             }
-        }
+
+            Type setup = Type.GetType(Commands.SetupClassName);
+
+            if ( setup != null )
+            {
+                ((ISetup)System.Activator.CreateInstance(setup)).Init();
+            }
+       }
 
         /// =============================================================================================
         /// <summary>
