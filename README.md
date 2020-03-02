@@ -8,7 +8,7 @@
 
 ## 概要
 
-**MajiXA**は、リアルタイム通信ゲームを開発することが出来るパッケージです。  
+**majiXA**は、リアルタイム通信ゲームを開発することが出来るパッケージです。  
 [nginx-luajit-ws](https://github.com/sassembla/nginx-luajit-ws)をベースにUnity上で開発をしやすくしたものです。  
 言語はC#です。
 
@@ -128,7 +128,7 @@ ws.Close();
 クライアントからサーバに対してデータを送信する方法  
 最初の1byte目には、必ずCommands.eComに設定した値を入れる必要があります。
 ```cs
-// 例えばXXXというコマンド（コマンドはMajiXA/ClientAndServer/Commands.csに記述）でfooというintを送りたい時
+// 例えばXXXというコマンド（コマンドはmajiXA/ClientAndServer/Commands.csに記述）でfooというintを送りたい時
 int foo = 1;
 List<byte> data = new List<byte>();
 data.Add((byte)Commands.eCom.XXX);
