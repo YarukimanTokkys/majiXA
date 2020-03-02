@@ -1,6 +1,6 @@
 <center><img src="logo.png" width="100"></center>
 
-# MajiXA
+# majiXA
 
 リアルタイム通信パッケージ for Unity
 
@@ -27,26 +27,26 @@
 ## クライアントのセットアップ
 
 1. Unity上で新規プロジェクトを作成します
-2. MajiXA_1.0.0.unitypackageをImportします
+2. majiXA_1.0.0.unitypackageをImportします
 3. [WebuSocket](https://github.com/sassembla/WebuSocket/archive/master.zip)をダウンロードして解凍します。
-4. WebuSocket-master/WebuSocketフォルダを、1.で作ったプロジェクトのAssets/MajiXA/Client/以下にコピーします。
+4. WebuSocket-master/WebuSocketフォルダを、1.で作ったプロジェクトのAssets/majiXA/Client/以下にコピーします。
 5. [Disquuun](https://github.com/sassembla/Disquuun/archive/master.zip)をダウンロードして解凍します。
-6. Disquuun-master/Disquuunフォルダを、1.で作ったプロジェクトのAssets/MajiXA/Server/Editor/以下にコピーします。
+6. Disquuun-master/Disquuunフォルダを、1.で作ったプロジェクトのAssets/majiXA/Server/Editor/以下にコピーします。
 
 ---
 ## 動作確認
 
 サンプルを使って動作確認をします。
 
-1. MajiXA_Sample.unitypackageをImportします
+1. majiXA_Sample.unitypackageをImportします
 2. Assets/Sample/からSampleシーンを開きます。
-3. MajiXA/Configs/のConfig.csのBUNDLE_IDENTIFIERをユニークなバンドルIDに書き換えます。
+3. majiXA/Configs/のConfig.csのBUNDLE_IDENTIFIERをユニークなバンドルIDに書き換えます。
 
 これでサンプルの準備は完了です。  
 以下から動作確認をします。
 
 5. Unityから再生します。
-6. メニューからMajiXA > Local Server Controller を選択してウィンドウを表示します。
+6. メニューからmajiXA > Local Server Controller を選択してウィンドウを表示します。
 7. LocalServerCtrl(以後LSC)の「Start」ボタンを押します。接続プレイヤー数とルーム数が表示されます。
 8. Game画面内の「Connect to Server」ボタンを押します。
 9. *LSCの接続プレイヤー数が1になったことを確認します。*
@@ -81,26 +81,26 @@
 
 サーバ側のプログラムを配置します。
 
-1. DotNet Coreおよびdotnet-sdkをインストールします。
+1. DotNetCoreをインストールします。
 2. サーバプログラムに必要なプログラムを配置します。
 　　Program.cs
 　　majixa.csproj
-　　Assets/MajiXA/ClientAndServer/*
-　　Assets/MajiXA/Configs/Editor/*
-　　Assets/MajiXA/Server/Editor/*
+　　Assets/majiXA/ClientAndServer/*
+　　Assets/majiXA/Configs/Editor/*
+　　Assets/majiXA/Server/Editor/*
 　　その他プロジェクトで追加したサーバ側プログラム
 3. ビルド `dotnet build`
 4. 実行 `dotnet run`
 
 ---
 ## 設定
-MajiXA内の設定ファイルをいくつか修正する必要があります。
-- MajiXA/ClientAndServer/Commands.cs  
+majiXA内の設定ファイルをいくつか修正する必要があります。
+- majiXA/ClientAndServer/Commands.cs  
     - ProcessingNameSpace  
 サーバ側の処理(IProcessingを継承したクラス)でnamespaceを使用する際はそのnamespaceを記述
     - eCom  
 各種コマンドを設定
-- MajiXA/Configs/Editor/Server.cs
+- majiXA/Configs/Editor/Server.cs
     - DISQUE_HOST_IP
     - DISQUE_PORT  
     接続先DisqueのIPとポートを設定します。  
@@ -111,7 +111,7 @@ MajiXA内の設定ファイルをいくつか修正する必要があります�
 IPアドレスとポートを指定します。  
 Config.Common.BUNDLE_IDENTIFIERを、ユニークな文字列になるように変更する必要があります。
 ```cs
-using MajiXA;
+using majiXA;
 
 void Start()
 {
