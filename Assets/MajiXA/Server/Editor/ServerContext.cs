@@ -50,7 +50,7 @@ namespace majiXA
             processingActionDict = new Dictionary<byte, IProcessing>();
             foreach ( eCommand cmd in Enum.GetValues(typeof(eCommand)) )
             {
-                string processingName = Commands.ProcessingNameSpace + cmd.ToString();
+                string processingName = Config.Common.ProcessingNameSpace + cmd.ToString();
                 Type t = Type.GetType(processingName);
 
                 if ( t != null )
@@ -60,7 +60,7 @@ namespace majiXA
                 }
             }
 
-            Type setup = Type.GetType(Commands.SetupClassName);
+            Type setup = Type.GetType(Config.Common.SetupClassName);
 
             if ( setup != null )
             {
