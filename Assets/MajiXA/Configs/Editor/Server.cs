@@ -1,4 +1,4 @@
-﻿﻿namespace MajiXA.Config
+﻿﻿namespace majiXA.Config
 {
     public class Server
     {

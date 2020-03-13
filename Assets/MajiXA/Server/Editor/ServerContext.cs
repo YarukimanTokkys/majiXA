@@ -6,11 +6,11 @@ using System.Collections.Specialized;
 using System.IO;
 using System.Text;
 using System.Diagnostics;
-using MajiXA;
+using majiXA;
 using System.Net;
 using System.Collections.Concurrent;
 
-namespace MajiXA
+namespace majiXA
 {
     public class ServerContext
     {
@@ -48,7 +48,7 @@ namespace MajiXA
 
             // Receiverを生成
             processingActionDict = new Dictionary<byte, IProcessing>();
-            foreach ( Commands.eCom cmd in Enum.GetValues(typeof(Commands.eCom)) )
+            foreach ( eCommand cmd in Enum.GetValues(typeof(eCommand)) )
             {
                 string processingName = Commands.ProcessingNameSpace + cmd.ToString();
                 Type t = Type.GetType(processingName);
@@ -162,7 +162,7 @@ namespace MajiXA
                         return;
                     }
 
-                    Logger.Debug("[OnMessage] Command=" + ((Commands.eCom)cmd).ToString() + " : data.len=" + _data.Length);
+                    Logger.Debug("[OnMessage] Command=" + ((eCommand)cmd).ToString() + " : data.len=" + _data.Length);
                     processingActionDict[cmd].OnMessage(this, cInfo, _data);
                 }
                 else

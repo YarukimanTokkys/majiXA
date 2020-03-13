@@ -1,4 +1,4 @@
-﻿namespace MajiXA
+﻿namespace majiXA
 {
     public class SendQueueRow
     {

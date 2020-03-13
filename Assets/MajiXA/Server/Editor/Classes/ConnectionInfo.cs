@@ -1,4 +1,4 @@
-﻿namespace MajiXA
+﻿namespace majiXA
 {
     /// <summary>
     /// 接続しているプレイヤーの情報を管理

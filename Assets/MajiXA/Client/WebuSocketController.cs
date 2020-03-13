@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using WebuSocketCore;
 
-namespace MajiXA
+namespace majiXA
 {
     public class WebuSocketController : MonoBehaviour
     {

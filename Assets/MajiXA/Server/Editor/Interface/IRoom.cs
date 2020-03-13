@@ -1,6 +1,6 @@
 ﻿﻿using System.Collections.Generic;
 
-namespace MajiXA
+namespace majiXA
 {
     public interface IRoom
     {

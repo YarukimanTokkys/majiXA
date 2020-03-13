@@ -1,6 +1,4 @@
-﻿using MajiXA;
-
-using System;
+﻿using System;
 using System.Text;
 using System.Linq;
 using System.Collections.Generic;
@@ -8,7 +6,7 @@ using DisquuunCore;
 using DisquuunCore.Deserialize;
 using System.Collections.Concurrent;
 
-namespace MajiXA
+namespace majiXA
 {
     public class DisqueConnectionController
     {

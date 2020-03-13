@@ -4,11 +4,11 @@ using UnityEngine;
 using UnityEditor;
 using System;
 
-namespace MajiXA
+namespace majiXA
 {
     public class LocalServerCtrl : EditorWindow
     {
-        [MenuItem ("MajiXA/Local Server controller")]
+        [MenuItem ("majiXA/Local Server Controller")]
         static void Init()
         {
             var window = (LocalServerCtrl)EditorWindow.GetWindow(typeof(LocalServerCtrl));

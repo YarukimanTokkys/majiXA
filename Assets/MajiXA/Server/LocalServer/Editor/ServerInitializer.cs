@@ -3,7 +3,7 @@ using UnityEditor;
 using System;
 using UnityEngine;
 
-namespace MajiXA
+namespace majiXA
 {
     /// <summary>
     /// Unity上でServerContextを動かすためのクラス

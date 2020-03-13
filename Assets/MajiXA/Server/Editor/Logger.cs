@@ -4,7 +4,7 @@ using System.Text;
 using System.Collections.Generic;
 using System.Globalization;
 
-namespace MajiXA
+namespace majiXA
 {
     public class Logger
     {

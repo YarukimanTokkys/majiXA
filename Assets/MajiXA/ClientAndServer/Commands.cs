@@ -1,12 +1,13 @@
-﻿﻿namespace MajiXA
+﻿﻿namespace majiXA
 {
     public class Commands
     {
         public const string ProcessingNameSpace = "";
         public const string SetupClassName = "";
 
-        public enum eCom : int
-        {
-        }
+    }
+    
+    public enum eCommand : int
+    {
     }
 }
