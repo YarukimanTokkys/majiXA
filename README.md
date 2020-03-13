@@ -1,4 +1,4 @@
-<center><img src="logo.png" width="100"></center>
+<center><img src="Docs/logo.png" width="100"></center>
 
 # majiXA
 
@@ -13,7 +13,7 @@
 言語はC#です。
 
 ### 仕組み
-![画像](img.svg)
+![画像](Docs/img.svg)
 
 ---
 ## 動作確認環境
