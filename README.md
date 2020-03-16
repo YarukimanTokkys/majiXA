@@ -189,6 +189,16 @@ public class Room : IRoom
 
 ## eCommandに設定されているコマンドと同名のclassを用意する。その際、IProcessingを継承する。
 ```cs
+majiXA/ClientAndServer/Commands.cs
+
+public enum eCommand : int {
+    XXX, // <= 任意の名前のコマンドを追記
+}
+
+```
+- OnMessageはclass名のコマンドがクライアントから送信されてきた際に呼ばれます。
+
+```cs
 public class XXX : IProcessing
 {
     public void OnMessage(ServerContext context, ConnectionInfo cInfo, byte[] data)
@@ -198,7 +208,6 @@ public class XXX : IProcessing
     }
 }
 ```
-- OnMessageはclass名のコマンドがクライアントから送信されてきた際に呼ばれます。
 
 
 
