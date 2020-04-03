@@ -42,13 +42,20 @@ namespace majiXA
         public Action<string> errorAct;
         // 他の誰かが切断した時の処理
         public Action<int,int,int> disconnectedAct;
+        // サーバから強制的に切断された時の処理
+        public Action<string> forceCloseAct;
 
         void Awake()
         {
+            errorAct += ErrorAct;
+            disconnectedAct += DisconnectedAct;
+            forceCloseAct += ForceCloseAct;
+
             ConnectStatus = eConnectStatus.Disconnected;
             receiveActionDict = new Dictionary<byte,Action<byte[]>>();
             receiveActionDict.Add(Define.CmdError, ReceiveError);
             receiveActionDict.Add(Define.CmdDisconnected, ReceiveDisconnected);
+            receiveActionDict.Add(Define.CmdForceClose, ReceiveForceClosed);
         }
         /// =============================================================================================
         /// <summary>
@@ -74,6 +81,18 @@ namespace majiXA
             int playerNo = data.ToInt(ref cursor);
             disconnectedAct(roomId, remainMemberNum, playerNo);
         }
+        /// =============================================================================================
+        /// <summary>
+        /// サーバから強制的に切断された際に呼ばれる
+        /// </summary>
+        /// <param name="data">切断情報（ルームID,ルームに残った人数、切断したプレイヤーのplayerNo）</param>
+        void ReceiveForceClosed(byte[] data)
+        {
+            int cursor = 0;
+            string message = ( data.Length>0 ) ? data.ToString(ref cursor) : "";
+            forceCloseAct(message);
+            Close();
+        }
 
         /// =============================================================================================
         /// <summary>
@@ -95,6 +114,16 @@ namespace majiXA
         void DisconnectedAct(int roomId, int remainMemberNum, int playerNo)
         {
             Debug.Log("Someone disconnected!!\nroomId:"+ roomId +"\nremainMemberNum:"+ remainMemberNum +"\nplayerNo:"+ playerNo);
+        }
+
+        /// =============================================================================================
+        /// <summary>
+        /// デフォルトのサーバからの強制切断処理
+        /// </summary>
+        /// <param name="message">サーバから送られてきた文言</param>
+        void ForceCloseAct(string message)
+        {
+            Debug.Log("Forced close command from server!!\nmessage:"+ message);
         }
         
         /// =============================================================================================
