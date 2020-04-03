@@ -258,38 +258,10 @@ namespace majiXA
         /// <param name="cmd">メンテナンス用に用意する任意のデータ</param>
         public void MaintenanceCommand(byte[] cmd)
         {
-            var command = Encoding.UTF8.GetString(cmd);
-            Logger.Info("[Maintenance] command = "+ command);
-            
-            switch ( command )
+            Type maintenance = Type.GetType(Config.Common.MaintenanceClassName);
+            if ( maintenance != null )
             {
-                case "Log":
-                    StringBuilder sb = new StringBuilder();
-                    sb.AppendLine("");
-                    sb.Append("== 接続人数:").AppendLine(cidConnectionMap.Count.ToString());
-                    foreach( var con in cidConnectionMap.Values )
-                    {
-                        sb.Append("   [cid:").Append(con.ConnectionId).Append("] PlayerId=\"").Append(con.PlayerId).Append("\" / RoomId=").AppendLine(con.RoomId.ToString());
-                    }
-                    sb.Append("== ルーム数:").AppendLine(roomIdRoomMap.Count.ToString());
-                    foreach( var room in roomIdRoomMap.Values )
-                    {
-                        sb.Append("   [RoomId:").Append(room.RoomId.ToString()).Append("] Member=").AppendLine(room.MembersCid.Count.ToString());
-                    }
-                    Logger.Info(sb.ToString());
-                    break;
-                case "AllClear":
-                    cidConnectionMap.Clear();
-                    roomIdRoomMap.Clear();
-                    Logger.Info("done");
-                    break;
-                case "ForcedStop":
-                    var message = "サーバにより強制的に切断します";
-                    var ret = new List<byte>();
-                    ret.Add(Define.CmdForceClose);
-                    ret.AddRange(message.ToBytes());
-                    Send(ret.ToArray(), cidConnectionMap.Keys);
-                    break;
+                ((IMaintenance)System.Activator.CreateInstance(maintenance)).OnCommand(this, cmd);
             }
         }
 
