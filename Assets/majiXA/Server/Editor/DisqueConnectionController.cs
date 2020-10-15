@@ -12,8 +12,15 @@ namespace majiXA
     {
         private ServerContext context;
         private Disquuun disquuun;
+        private DisqueReconnector disqueReconnector;
 
         public DisqueConnectionController(string contextQueueIdentity, string ip, int port)
+        {
+            disqueReconnector = new DisqueReconnector(contextQueueIdentity, ip, port);
+            Connect(contextQueueIdentity, ip, port);
+        }
+
+        public void Connect(string contextQueueIdentity, string ip, int port)
         {
             disquuun = new Disquuun(
                 ip,
@@ -41,6 +48,18 @@ namespace majiXA
                             return true;
                         }
                     );
+                },
+                (conId, err) => {
+                    Logger.Error("disque failed. state = " + disquuun.connectionState + ", message = " + err.Message);
+
+                    if (disquuun.connectionState != Disquuun.ConnectionState.OPENING &&
+                        disquuun.connectionState != Disquuun.ConnectionState.ALLCLOSING)
+                    {
+                        disquuun.Disconnect();
+                        Logger.Error("disque self disconnected.");
+                    }
+
+                    disqueReconnector.Reconnect(this, Connect);
                 }
             );
         }
@@ -48,6 +67,11 @@ namespace majiXA
         public void Disconnect()
         {
             if (disquuun != null) disquuun.Disconnect();
+        }
+
+        public Disquuun GetDisquuun()
+        {
+            return disquuun;
         }
 
         public void SetContext(ServerContext context)
