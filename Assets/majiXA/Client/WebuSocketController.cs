@@ -254,12 +254,12 @@ namespace majiXA
                 return;
             }
 
-            try
+            // Queueに貯まった送信データを送信
+            if (sendQueue.Count > 0)
             {
-                // Queueに貯まった送信データを送信
-                if (sendQueue.Count > 0)
+                lock (sendLock)
                 {
-                    lock (sendLock)
+                    try
                     {
                         foreach (var data in sendQueue)
                         {
@@ -267,12 +267,19 @@ namespace majiXA
                         }
                         sendQueue.Clear();
                     }
+                    catch (Exception e)
+                    {
+                        Debug.LogError(e.ToString());
+                    }
                 }
+            }
 
-                // サーバから送信されてきたデータを取得
-                if (0 < binaryQueue.Count)
+            // サーバから送信されてきたデータを取得
+            if (0 < binaryQueue.Count)
+            {
+                lock (lockObj)
                 {
-                    lock (lockObj)
+                    try
                     {
                         foreach (var data in binaryQueue)
                         {
@@ -280,24 +287,24 @@ namespace majiXA
                         }
                         binaryQueue.Clear();
                     }
-                }
-
-                // RTTチェック（数値に変化があった時だけAction着火）
-                timeCount -= Time.deltaTime;
-                if ( timeCount<0f)
-                {
-                    WebuSocket.Ping((rtt) => { Rtt = rtt;});
-                    timeCount = 1f;
-                }
-                if ( _rtt != Rtt )
-                {
-                    rttAct?.Invoke(Rtt);
-                    _rtt = Rtt;
+                    catch(Exception e)
+                    {
+                        Debug.LogError(e.ToString());
+                    }
                 }
             }
-            catch (Exception e)
+
+            // RTTチェック（数値に変化があった時だけAction着火）
+            timeCount -= Time.deltaTime;
+            if ( timeCount<0f)
             {
-                Debug.LogError(e.ToString());
+                WebuSocket.Ping((rtt) => { Rtt = rtt;});
+                timeCount = 1f;
+            }
+            if ( _rtt != Rtt )
+            {
+                rttAct?.Invoke(Rtt);
+                _rtt = Rtt;
             }
         }
 
