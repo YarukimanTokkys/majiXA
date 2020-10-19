@@ -11,6 +11,7 @@ namespace majiXA
         // クライアントの接続状態を表す
         public enum eConnectStatus : int {
             Disconnected,
+            Error,
             Connected,
             Connecting
         }
@@ -21,6 +22,14 @@ namespace majiXA
         // ソケット接続
         public WebuSocket WebuSocket { get; private set; }
 
+        // クライアント <-> サーバ間の通信速度
+        public int Rtt { get; private set; }
+
+        // サーバから受け取ったデータを処理するReceiverを保持
+        public Dictionary<byte,Action<byte[]>> receiveActionDict { get; private set; }
+        
+
+        // ================== ローカル変数 ==================== //
         // クライアント -> サーバにデータ送信処理用のロック
         object sendLock = new object();
         Queue<byte[]> sendQueue = new Queue<byte[]>();
@@ -29,21 +38,39 @@ namespace majiXA
         object lockObj = new object();
         Queue<byte[]> binaryQueue = new Queue<byte[]>();
 
-        // クライアント <-> サーバ間の通信速度
-        public int Rtt { get; private set; }
-
-        // Rtt計測の頻度（秒 )
+        // サスペンド中かどうか
+        bool IsSuspended = false;
+        // Rtt計測の頻度（秒)
         float timeCount = 1f;
+        // 接続状態の変更検知用
+        eConnectStatus _ConnectStatus = eConnectStatus.Disconnected;
+        // 切断・エラーのコード引渡し用
+        int reasonCode = 0;
+        // Rttの変化検知用
+        int _rtt;
 
-        // サーバから受け取ったデータを処理するReceiverを保持
-        public Dictionary<byte,Action<byte[]>> receiveActionDict { get; private set; }
-        
+        // =================== 各種Action ================== //
         // サーバエラー取得時の処理
         public Action<string> errorAct;
         // 他の誰かが切断した時の処理
         public Action<int,int,int> disconnectedAct;
         // サーバから強制的に切断された時の処理
         public Action<string> forceCloseAct;
+        
+        // クライアント -> サーバ -> クライアント の通信速度（ミリ秒）
+        public Action<int> rttAct;
+        // サスペンドした時のイベント
+        public Action suspendAct;
+        // レジュームした時のイベント（引数はレジューム時の通信状態）
+        public Action<eConnectStatus> resumeAct;
+        // WebSocket接続完了時に呼ばれる
+        public Action connectedAct;
+        // WebSocket切断時に呼ばれる（パラメータ = WebuSocketCloseEnum）
+        public Action<int> closedAct;
+        // WebSocketで接続エラーが発生した時に呼ばれる（パラメータ = WebuSocketErrorEnum
+        public Action<int> errorCloseAct;
+
+
 
         void Awake()
         {
@@ -101,7 +128,7 @@ namespace majiXA
         /// <param name="reason">エラーの原因</param>
         void ErrorAct(string reason)
         {
-            Debug.Log("MajiXA Error!! : "+ reason);
+            Debug.Log("majiXA Error!! : "+ reason);
         }
         
         /// =============================================================================================
@@ -144,13 +171,13 @@ namespace majiXA
             ConnectStatus = eConnectStatus.Connecting;
 
             var serverURL = string.Format("{0}://{1}/disque_client{2}", (isWss ? "wss" : "ws"), ipPort, gameKey);
+            Debug.Log("[majiXA] connecting to : " + serverURL);
 
             WebuSocket = new WebuSocket(
                 serverURL,
                 1024 * 100,
                 () =>
                 {
-                    Debug.Log("connected to server:" + serverURL);
                     ConnectStatus = eConnectStatus.Connected;
                 },
                 (Queue<ArraySegment<byte>> datas) =>
@@ -169,17 +196,16 @@ namespace majiXA
                 () =>
                 {
                     // pinged.
-                    Debug.Log("get Ping");
                 },
                 (WebuSocketCloseEnum closedReason) =>
                 {
-                    Debug.LogWarning("connection closed by reason:" + closedReason);
                     ConnectStatus = eConnectStatus.Disconnected;
+                    reasonCode = (int)closedReason;
                 },
                 (WebuSocketErrorEnum errorMessage, Exception e) =>
                 {
-                    Debug.LogError("connection error:" + errorMessage);
-                    ConnectStatus = eConnectStatus.Disconnected;
+                    ConnectStatus = eConnectStatus.Error;
+                    reasonCode = (int)errorMessage;
                 },
                 new Dictionary<string, string>{
                     {"param", param},
@@ -188,13 +214,42 @@ namespace majiXA
             );
         }
 
+        public void ConnectStatusHandler()
+        {
+            if ( _ConnectStatus == ConnectStatus)
+            {
+                return;
+            }
+
+            switch ( ConnectStatus )
+            {
+                case eConnectStatus.Connected:
+                    Debug.Log("[majiXA] connected");
+                    connectedAct?.Invoke();
+                    break;
+                case eConnectStatus.Disconnected:
+                    Debug.Log("[majiXA] closed : "+ (WebuSocketCloseEnum)reasonCode);
+                    closedAct?.Invoke(reasonCode);
+                    break;
+                case eConnectStatus.Error:
+                    Debug.LogError("[majiXA] error : "+ (WebuSocketErrorEnum)reasonCode);
+                    errorCloseAct?.Invoke(reasonCode);
+                    ConnectStatus = eConnectStatus.Disconnected;
+                    break;
+            }
+
+            _ConnectStatus = ConnectStatus;
+        }
+
         /// =============================================================================================
         /// <summary>
         /// データ送受信用ループ
         /// </summary>
         public void FixedUpdate()
         {
-            if (ConnectStatus != eConnectStatus.Connected)
+            ConnectStatusHandler();
+
+            if ( ConnectStatus != eConnectStatus.Connected )
             {
                 return;
             }
@@ -204,18 +259,18 @@ namespace majiXA
             {
                 lock (sendLock)
                 {
-                    foreach (var data in sendQueue)
+                    try
                     {
-                        try
+                        foreach (var data in sendQueue)
                         {
                             WebuSocket.Send(data);
                         }
-                        catch (Exception e)
-                        {
-                            Debug.LogError(e.ToString());
-                        }
+                        sendQueue.Clear();
                     }
-                    sendQueue.Clear();
+                    catch (Exception e)
+                    {
+                        Debug.LogError(e.ToString());
+                    }
                 }
             }
 
@@ -224,30 +279,32 @@ namespace majiXA
             {
                 lock (lockObj)
                 {
-                    foreach (var data in binaryQueue)
+                    try
                     {
-                        try
+                        foreach (var data in binaryQueue)
                         {
                             Receive(data);
                         }
-                        catch (Exception e)
-                        {
-                            UnityEngine.Debug.LogError(e.ToString());
-                        }
+                        binaryQueue.Clear();
                     }
-                    binaryQueue.Clear();
+                    catch(Exception e)
+                    {
+                        Debug.LogError(e.ToString());
+                    }
                 }
             }
 
-            // RTTチェック
+            // RTTチェック（数値に変化があった時だけAction着火）
             timeCount -= Time.deltaTime;
             if ( timeCount<0f)
             {
-                WebuSocket.Ping((rtt) =>
-                {
-                    Rtt = rtt;
-                });
+                WebuSocket.Ping((rtt) => { Rtt = rtt;});
                 timeCount = 1f;
+            }
+            if ( _rtt != Rtt )
+            {
+                rttAct?.Invoke(Rtt);
+                _rtt = Rtt;
             }
         }
 
@@ -330,5 +387,24 @@ namespace majiXA
         {
             Close();
         }
+
+        void OnApplicationPause(bool pause)
+        {
+            if ( pause && !IsSuspended )
+            {
+                Debug.Log("[Suspend]");
+                suspendAct?.Invoke();
+                IsSuspended = true;
+            }
+            else if ( !pause && IsSuspended )
+            {
+                Debug.Log("[Resume]");
+                resumeAct?.Invoke(ConnectStatus);
+                IsSuspended = false;
+            }
+        }
+
+
+
     }
 }
