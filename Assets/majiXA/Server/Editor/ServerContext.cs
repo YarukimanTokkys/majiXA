@@ -9,6 +9,7 @@ using System.Diagnostics;
 using majiXA;
 using System.Net;
 using System.Collections.Concurrent;
+using System.Reflection;
 
 namespace majiXA
 {
@@ -46,27 +47,37 @@ namespace majiXA
         {
             Frame = 0;
 
+            var proccessingTypes = GetInterfaces<IProcessing>();
+
             // Receiverを生成
             processingActionDict = new Dictionary<byte, IProcessing>();
             foreach ( eCommand cmd in Enum.GetValues(typeof(eCommand)) )
             {
-                string processingName = Config.Common.ProcessingNameSpace + cmd.ToString();
-                Type t = Type.GetType(processingName);
+                var proccessingType = proccessingTypes.FirstOrDefault(_=>_.Name==cmd.ToString());
 
-                if ( t != null )
+                if ( proccessingType != null )
                 {
-                    Logger.Info("Add Processing : "+ processingName);
-                    processingActionDict.Add((byte)cmd, (IProcessing)System.Activator.CreateInstance(t));
+                    Logger.Info("Add Processing : "+ proccessingType.FullName);
+                    processingActionDict.Add((byte)cmd, (IProcessing)System.Activator.CreateInstance(proccessingType));
+                }
+                else
+                {
+                    Logger.Warning("Not found Processing : "+ cmd.ToString());
                 }
             }
 
-            Type setup = Type.GetType(Config.Common.SetupClassName);
+            var setupType = GetInterfaces<ISetup>();
 
-            if ( setup != null )
+            if ( setupType != null && setupType.Length == 1 )
             {
-                ((ISetup)System.Activator.CreateInstance(setup)).Init();
+                ((ISetup)System.Activator.CreateInstance(setupType[0])).Init();
             }
-       }
+        }
+
+        public static Type[] GetInterfaces<T>()
+        {
+            return Assembly.GetExecutingAssembly().GetTypes().Where(c => c.GetInterfaces().Any(t => t == typeof(T))).ToArray();
+        }
 
         /// =============================================================================================
         /// <summary>
@@ -258,10 +269,10 @@ namespace majiXA
         /// <param name="cmd">メンテナンス用に用意する任意のデータ</param>
         public void MaintenanceCommand(byte[] cmd)
         {
-            Type maintenance = Type.GetType(Config.Common.MaintenanceClassName);
-            if ( maintenance != null )
+            var maitenanceTypes = GetInterfaces<IMaintenance>();
+            if ( maitenanceTypes != null && maitenanceTypes.Length == 1 )
             {
-                ((IMaintenance)System.Activator.CreateInstance(maintenance)).OnCommand(this, cmd);
+                ((IMaintenance)System.Activator.CreateInstance(maitenanceTypes[0])).OnCommand(this, cmd);
             }
         }
 
