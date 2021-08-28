@@ -1,0 +1,7 @@
+{
+	"MAINTENANCE_USER":"000-Backdoor_For_Maintenanceuser-000",
+	"LOG_PATH":"./server.log",
+	"DISQUE_HOST_IP":"203.137.165.35",
+	"DISQUE_PORT":7711,
+	"REMOVE_EMPTY_ROOM":false,
+}
