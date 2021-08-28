@@ -213,9 +213,12 @@ namespace majiXA
 
                     if ( room.Leave(cInfo) == 0 )
                     {
-                        // roomから全員切断したらルーム削除
-                        Logger.Info("Room Delete complete");
-                        roomIdRoomMap.TryRemove(room.RoomId, out room);
+                        if (ServerConfig.Config.REMOVE_EMPTY_ROOM)
+                        {
+                            // roomから全員切断したらルーム削除
+                            Logger.Info("Room Delete complete");
+                            roomIdRoomMap.TryRemove(room.RoomId, out room);
+                        }
                     }
                     else
                     {

@@ -22,6 +22,7 @@ namespace majiXA
             Logger.Debug("ServerConfig.LOG_PATH = " + Config.LOG_PATH);
             Logger.Debug("ServerConfig.DISQUE_HOST_IP = " + Config.DISQUE_HOST_IP);
             Logger.Debug("ServerConfig.DISQUE_PORT = " + Config.DISQUE_PORT);
+            Logger.Debug("ServerConfig.REMOVE_EMPTY_ROOM = " + Config.REMOVE_EMPTY_ROOM);
         }
     }
 
@@ -31,5 +32,6 @@ namespace majiXA
         public string LOG_PATH;
         public string DISQUE_HOST_IP;
         public int DISQUE_PORT;
+        public bool REMOVE_EMPTY_ROOM;
     }
 }
