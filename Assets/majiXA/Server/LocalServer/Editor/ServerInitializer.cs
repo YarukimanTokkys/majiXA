@@ -13,12 +13,12 @@ namespace majiXA
     {
         static ServerInitializer()
         {
-            if ( string.IsNullOrEmpty(Config.Common.BUNDLE_IDENTIFIER) )
+            if ( string.IsNullOrEmpty(Setting.BUNDLE_IDENTIFIER) )
             {
                 Debug.LogError("BUNDLE_IDENTIFIER を設定してください。 (Config.cs)");
                 return;
             }
-            else if ( Config.Common.BUNDLE_IDENTIFIER == "com.Company.ProductName" )
+            else if ( Setting.BUNDLE_IDENTIFIER == "com.Company.ProductName" )
             {
                 Debug.LogError("BUNDLE_IDENTIFIER はユニークになるように設定してください。 (Config.cs)");
                 return;

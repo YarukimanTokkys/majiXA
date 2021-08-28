@@ -162,7 +162,7 @@ namespace majiXA
                         {
                             if (1 + CONNECTION_ID_LEN < len)
                             {
-                                if ( connectionId != Config.Server.MAINTENANCE_USER )
+                                if ( connectionId != ServerConfig.Config.MAINTENANCE_USER )
                                 {
                                     Logger.Error("Not maintenance user : "+ connectionId);
                                     continue;

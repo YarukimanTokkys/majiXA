@@ -9,7 +9,20 @@
 
         public static void Init()
         {
-            Logger.Init(Config.Server.LOG_PATH);
+#if UNITY_EDITOR
+            var path = "./Configs/config_local.json";
+#else
+            var path = "./Configs/config_server.json";
+#endif
+            ServerConfig.Load(path);
+
+            if ( ServerConfig.Config==null )
+            {
+                Logger.Error("Config cannot load.");
+                return;
+            }
+
+            Logger.Init(ServerConfig.Config.LOG_PATH);
             Logger.Info("[SERVER LOG] SETUP.");
         }
 
@@ -20,10 +33,10 @@
         public static void StartServer()
         {
             serverContext = new ServerContext();
-            disqueConnectionController = new DisqueConnectionController("disque_client" + Config.Common.BUNDLE_IDENTIFIER + "_context", Config.Server.DISQUE_HOST_IP, Config.Server.DISQUE_PORT);
+            disqueConnectionController = new DisqueConnectionController("disque_client" + Setting.BUNDLE_IDENTIFIER + "_context", ServerConfig.Config.DISQUE_HOST_IP, ServerConfig.Config.DISQUE_PORT);
             disqueConnectionController.SetContext(serverContext);
 
-            Logger.Info("[SERVER START] GameKey : " + Config.Common.BUNDLE_IDENTIFIER);
+            Logger.Info("[SERVER START] GameKey : " + Setting.BUNDLE_IDENTIFIER);
 
             Stat = true;
         }
