@@ -298,7 +298,7 @@ namespace majiXA
             timeCount -= Time.deltaTime;
             if ( timeCount<0f)
             {
-                WebuSocket.Ping((rtt) => { Rtt = rtt;});
+                WebuSocket?.Ping((rtt) => { Rtt = rtt;});
                 timeCount = 1f;
             }
             if ( _rtt != Rtt )
