@@ -52,6 +52,10 @@ namespace majiXA
             {
                 StopServer();
             }
+            else if ( state == PlayModeStateChange.EnteredPlayMode && ServerManager.ServerAutoStart)
+            {
+                StartServer();
+            }
         }
     }
 }

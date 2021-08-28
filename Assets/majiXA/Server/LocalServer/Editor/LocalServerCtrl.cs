@@ -8,6 +8,8 @@ namespace majiXA
 {
     public class LocalServerCtrl : EditorWindow
     {
+        const string MenuAutoStart = "majiXA/Server AutoStart";
+
         [MenuItem ("majiXA/Local Server Controller")]
         static void Init()
         {
@@ -153,5 +155,46 @@ namespace majiXA
 
             EditorGUI.indentLevel--;
         }
+
+        /// =====================================================================
+        /// サーバの自動起動関連
+        /// =====================================================================
+        private const string SaveKey = "ServerAutoStart";
+
+        [InitializeOnLoadMethod]
+        static void Initialize()
+        {
+            ServerManager.ServerAutoStart = GetFlag();
+            EditorApplication.delayCall += SetChecked;
+        }
+
+        [MenuItem(MenuAutoStart)]
+        static void ToggleFlag()
+        {
+            ServerManager.ServerAutoStart = !GetFlag();
+            SetFlag(ServerManager.ServerAutoStart);
+
+            SetChecked();
+        }
+        static void SetChecked()
+        {
+            Menu.SetChecked(MenuAutoStart, ServerManager.ServerAutoStart);
+        }
+        static bool GetFlag()
+        {
+            var data = EditorUserSettings.GetConfigValue(SaveKey);
+            bool ret;
+            if ( string.IsNullOrEmpty(data) || !bool.TryParse(data, out ret) )
+                return false;
+
+            return ret;
+        }
+        static void SetFlag(bool isEnable)
+        {
+            EditorUserSettings.SetConfigValue(SaveKey, isEnable.ToString());
+        }
+
+
     }
+
 }

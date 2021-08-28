@@ -5,6 +5,7 @@
         public static ServerContext serverContext;
         static DisqueConnectionController disqueConnectionController;
         public static bool Stat;
+        public static bool ServerAutoStart;
 
         public static void Init()
         {
